@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="header">
+                <h1>Currency Converter</h1>
+                <p class="subtitle">
+                    Real-time exchange rates at your fingertips
+                </p>
+            </div>
+
+            <div class="converter-card">
+                <div class="currency-input-group">
+                    <div class="currency-selector" @click="openModal('from')">
+                        <img :src="fromCurrency.flag" :alt="fromCurrency.code" class="flag-icon">
+                        <span class="currency-code">
+                            {{ fromCurrency.code }}
+                        </span>
+                        <span class="material-icons dropdown-icon">
+                            expand_more
+                        </span>
+                    </div>
+                    <input type="number" v-model="fromAmount" placeholder="0.00" class="amount-input"
+                        @input="clearResult">
+                </div>
+
+                <button class="swap-button" @click="swapCurrencies">
+                    <span class="material-icons">swap_vert</span>
+                </button>
+
+                <div class="currency-input-group">
+                    <div class="currency-selector" @click="openModal('to')">
+                        <img :src="toCurrency.flag" :alt="toCurrency.code" class="flag-icon">
+                        <span class="currency-code">
+                            {{ toCurrency.code }}
+                        </span>
+                        <span class="material-icons dropdown-icon">
+                            expand_more
+                        </span>
+                    </div>
+                    <input type="number" :value="toAmount" readonly placeholder="0.00"
+                        class="amount-input amount-input-readonly">
+                </div>
+                <button class="convert-button" @click="convertCurrency" :disabled="!fromAmount || loading">
+                    <span v-if="!loading">Convert</span>
+                    <span v-else class="loading-spinner"></span>
+                </button>
+
+                <transition name="fade">
+                    <div v-if="showResult" class="result-display">
+                        <div class="result-main">
+                            {{ formatNumber(fromAmount) }} {{ fromCurrency.code }} =
+                            {{ formatNumber(toAmount) }} {{ toCurrency.code }}
+                        </div>
+                        <div class="result-rate">
+                            1 {{ fromCurrency.code }} = {{ formatNumber(exchangeRate) }} {{ toCurrency.code }}
+                        </div>
+                    </div>
+                </transition>
+            </div>
+        </div>
+        <transition name="modal">
+            <div v-if="showModal" class="modal-overlay" @click="closeModal">
+                <div class="modal-content" @click.stop>
+                    <div class="modal-header">
+                        <h2>Select Currency</h2>
+                        <button class="close-button" @click="closeModal">
+                            <span class="material-icons">close</span>
+                        </button>
+                    </div>
+                    <div class="search-wrapper">
+                        <span class="material-icons search-icon">
+                            search
+                        </span>
+                        <input type="text" v-model="searchQuery" placeholder="Search currencies..."
+                            class="search-input">
+                    </div>
+                    <div class="currency-list">
+                        <div v-for="currency in filteredCurrencies" :key="currency.code" class="currency-item"
+                            @click="selectCurrency(currency)">
+                            <img :src="currency.flag" :alt="currency.code" class="currency-flag">
+                            <div class="currency-info">
+                                <span class="currency-code-text">
+                                    {{ currency.code }}
+                                </span>
+                                <span class="currency-name">
+                                    {{ currency.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="currency.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
